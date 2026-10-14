@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Luyện đề Aptis Reading</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html" class="brand">Aptis<span>Reading</span></a>
+  </header>
+
+  <main class="home">
+    <section class="hero">
+      <h1>Luyện đề Aptis Reading</h1>
+      <p>Chọn một đề để bắt đầu. Mỗi đề có thời gian làm bài <b>35 phút</b>, hết giờ hệ thống sẽ tự động nộp bài.</p>
+    </section>
+
+    <section class="final-card">
+      <div>
+        <div class="final-badge">🎯 FINAL EXAM</div>
+        <h2>Đề tổng hợp</h2>
+        <p>5 bài, mỗi bài lấy ngẫu nhiên từ một trong các đề 0–4. Câu hỏi và đáp án được đảo vị trí mỗi lần làm. Thời gian: <b>35 phút</b>.</p>
+      </div>
+      <div class="final-actions" id="finalActions"></div>
+    </section>
+
+    <h3 class="grid-title">Các đề luyện tập</h3>
+    <section class="exam-grid" id="examGrid"></section>
+  </main>
+
+  <script src="js/common.js"></script>
+  <script>
+    const grid = document.getElementById("examGrid");
+
+    // Lấy state còn hạn, hết hạn thì xoá
+    function liveState(id) {
+      const st = readState(id);
+      if (st && st.endTime <= Date.now()) { clearState(id); return null; }
+      return st;
+    }
+
+    /* ----- Đề tổng hợp ----- */
+    const fst = liveState(FINAL_ID);
+    document.getElementById("finalActions").innerHTML = fst
+      ? `<a class="btn btn-final" href="exam.html?de=final">Tiếp tục (còn ${fmtTime((fst.endTime - Date.now()) / 1000)})</a>
+         <button class="btn btn-link light" data-restart="final">Tạo đề mới</button>`
+      : `<a class="btn btn-final" href="exam.html?de=final">Bắt đầu đề tổng hợp</a>`;
+
+    /* ----- Các đề 0–4 ----- */
+    EXAM_IDS.forEach((id) => {
+      const card = document.createElement("article");
+      card.className = "exam-card";
+      card.innerHTML = `<div class="exam-no">Đề ${id}</div><p class="exam-name">Đang tải...</p>`;
+      grid.appendChild(card);
+
+      loadExamData(id)
+        .then((exam) => {
+          const st = liveState(id);
+          card.innerHTML = `
+            <div class="exam-no">Đề ${id}</div>
+            <p class="exam-name">${esc(exam.title)}</p>
+            <p class="exam-meta">${exam.parts.length} bài · ${totalQuestions(exam)} câu · ${exam.duration} phút</p>
+            <ul class="exam-parts">${exam.parts.map((p) => `<li>${esc(p.title)}</li>`).join("")}</ul>
+            ${st
+              ? `<a class="btn btn-primary" href="exam.html?de=${id}">Tiếp tục (còn ${fmtTime((st.endTime - Date.now()) / 1000)})</a>
+                 <button class="btn btn-link" data-restart="${id}">Làm lại từ đầu</button>`
+              : `<a class="btn btn-primary" href="exam.html?de=${id}">Bắt đầu làm bài</a>`}
+          `;
+        })
+        .catch(() => {
+          card.className = "exam-card disabled";
+          card.innerHTML = `
+            <div class="exam-no">Đề ${id}</div>
+            <p class="exam-name">Sắp có</p>
+            <p class="exam-meta">Đề này chưa có dữ liệu</p>
+            <button class="btn btn-primary" disabled>Bắt đầu làm bài</button>`;
+        });
+    });
+
+    document.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-restart]");
+      if (!b) return;
+      if (confirm("Bài đang làm sẽ bị xoá. Bạn muốn làm lại từ đầu?")) {
+        clearState(b.dataset.restart); // đề tổng hợp: xoá state => sinh đề ngẫu nhiên mới
+        location.href = `exam.html?de=${b.dataset.restart}`;
+      }
+    });
+  </script>
+</body>
+</html>
