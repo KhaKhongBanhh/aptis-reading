@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Làm bài</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="exam-page">
+  <header class="topbar">
+    <a href="index.html" class="brand" id="homeLink">Aptis<span>Reading</span></a>
+    <div class="topbar-title" id="examTitle"></div>
+    <div class="timer" id="timer" title="Thời gian còn lại">--:--</div>
+    <button class="btn btn-primary" id="submitBtn">Nộp bài</button>
+  </header>
+
+  <nav class="part-tabs" id="partTabs"></nav>
+
+  <main id="parts"></main>
+
+  <div class="part-nav">
+    <button class="btn btn-outline" id="prevBtn">← Bài trước</button>
+    <button class="btn btn-outline" id="nextBtn">Bài sau →</button>
+  </div>
+
+  <!-- Hộp xác nhận nộp bài -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal-box">
+      <h3>Nộp bài</h3>
+      <p id="modalMsg"></p>
+      <div class="modal-actions">
+        <button class="btn btn-outline" id="modalCancel">Làm tiếp</button>
+        <button class="btn btn-primary" id="modalOk">Nộp bài</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/common.js"></script>
+  <script src="js/exam.js"></script>
+</body>
+</html>
